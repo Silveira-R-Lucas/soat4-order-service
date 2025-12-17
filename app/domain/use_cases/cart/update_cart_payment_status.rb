@@ -10,7 +10,6 @@ class UpdateCartPaymentStatus
     if payment_status == 'pago'
         cart.mark_as_paid
         cart.mark_as_received!
-        @cart_repository.save(cart)
     else
         cart.update_payment_status!(payment_status)
     end

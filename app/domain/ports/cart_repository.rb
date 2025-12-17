@@ -11,7 +11,7 @@ module CartRepository
     raise NotImplementedError
   end
 
-  def find_or_create_by_client_id(client_id)
+  def find_or_create_by_client_id(client_id, cart_id)
     raise NotImplementedError
   end
 

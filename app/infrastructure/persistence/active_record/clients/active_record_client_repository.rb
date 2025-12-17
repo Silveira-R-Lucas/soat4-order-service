@@ -1,6 +1,4 @@
 class ActiveRecordClientRepository
-  include ClientRepository
-
   def save(client)
     ar_client = client.id ? ClientModel.find(client.id) : ClientModel.new
     ar_client.name = client.name
@@ -16,7 +14,7 @@ class ActiveRecordClientRepository
   def find(id)
     begin
       ar_client = ClientModel.find(id)
-      Client.new(id: ar_client.id, name: ar_client.name, email: ar_client.email, cpf: ar_client.cpf)
+      ClientModel.new(id: ar_client.id, name: ar_client.name, email: ar_client.email, cpf: ar_client.cpf)
     rescue ActiveRecord::RecordNotFound
       nil
     end
@@ -25,7 +23,7 @@ class ActiveRecordClientRepository
   def find_by_email(email)
     ar_client = ClientModel.find_by(email: email)
     if ar_client
-      Client.new(id: ar_client.id, name: ar_client.name, email: ar_client.email, cpf: ar_client.cpf)
+      ClientModel.new(id: ar_client.id, name: ar_client.name, email: ar_client.email, cpf: ar_client.cpf)
     else
       nil
     end
@@ -35,7 +33,7 @@ class ActiveRecordClientRepository
     ar_client = ClientModel.find_by(cpf: cpf)
 
     if ar_client
-      Client.new(
+      ClientModel.new(
         id: ar_client.id,
         name: ar_client.name,
         email: ar_client.email,

@@ -5,6 +5,7 @@ ruby "3.2.2"
 gem 'pg'
 gem 'bunny'
 gem "faker"
+gem 'pry'
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "~> 7.0.6"
 
@@ -71,4 +72,10 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
   gem "webdrivers"
+  gem 'rspec-rails'
+  gem 'factory_bot_rails'
+  gem 'faker'
+  gem 'simplecov', require: false
+  gem 'database_cleaner-active_record'
+  gem 'pry'
 end
