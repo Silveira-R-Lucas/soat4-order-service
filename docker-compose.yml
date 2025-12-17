@@ -1,0 +1,65 @@
+version: "3"
+services:
+  order-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: soat4/order-service
+    container_name: order-service
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./app:/rails/app
+      - ./config:/rails/config
+    environment:
+      - RAILS_ENV=development
+      - RAILS_MAX_THREADS=10
+      - RAILS_SERVE_STATIC_FILES=true
+      - DATABASE_URL=${DATABASE_URL}
+      - SECRET_KEY_BASE=${SECRET_KEY_BASE}
+    depends_on:
+      - db
+    networks:
+      - soat-network
+  db:
+    image: postgres
+    environment:
+       - POSTGRES_USER=${POSTGRES_USER}
+       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+       - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - db_data:/var/lib/postgresql
+    networks:
+      - soat-network
+  rabbitmq:
+    image: rabbitmq:3.12-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"   # porta de mensageria
+      - "15672:15672" # painel web
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - soat-network
+
+  order-consumer:
+    image: soat4/order-service
+    container_name: order-consumer
+    command: bundle exec rails runner -e development app/workers/start_pagamento_consumer.rb
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+    depends_on:
+      - rabbitmq
+      - order-service
+    networks:
+      - soat-network
+    restart: always
+    
+volumes:
+  db_data:
+  
+networks:
+  soat-network:
+    external: true

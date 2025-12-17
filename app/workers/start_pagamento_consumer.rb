@@ -1,0 +1,1 @@
+RabbitmqConsumer.new('pagamento.events', 'order-service.pagamento').start_listening
