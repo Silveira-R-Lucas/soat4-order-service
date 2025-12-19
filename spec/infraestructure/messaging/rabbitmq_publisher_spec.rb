@@ -1,14 +1,16 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe RabbitmqPublisher do
   let(:channel) { instance_double(Bunny::Channel) }
   let(:exchange) { instance_double(Bunny::Exchange) }
-  
-  subject { described_class.new("my_exchange") }
+
+  subject { described_class.new('my_exchange') }
 
   before do
     allow(RabbitmqConnection).to receive(:channel).and_return(channel)
-    allow(channel).to receive(:fanout).with("my_exchange", durable: true).and_return(exchange)
+    allow(channel).to receive(:fanout).with('my_exchange', durable: true).and_return(exchange)
   end
 
   describe '#publish' do

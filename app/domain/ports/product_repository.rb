@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ProductRepository
   def save(product)
     raise NotImplementedError

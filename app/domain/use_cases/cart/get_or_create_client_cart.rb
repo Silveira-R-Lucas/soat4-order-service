@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class GetOrCreateClientCart
   def initialize(cart_repository:)
     @cart_repository = cart_repository

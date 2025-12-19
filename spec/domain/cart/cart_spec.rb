@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Cart do
@@ -64,10 +66,10 @@ RSpec.describe Cart do
     it 'calcula a soma total dos itens' do
       p1 = Product.new(id: 1, price: 10.0)
       p2 = Product.new(id: 2, price: 5.50)
-      
+
       cart.add_item(product: p1, quantity: 2) # 20.0
       cart.add_item(product: p2, quantity: 1) # 5.5
-      
+
       expect(cart.total_amount).to eq(25.5)
     end
   end

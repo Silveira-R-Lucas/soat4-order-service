@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe RabbitmqConnection do
@@ -23,7 +25,7 @@ RSpec.describe RabbitmqConnection do
       call_count = 0
       allow(bunny_session).to receive(:start) do
         call_count += 1
-        raise Bunny::NetworkFailure.new("Fail", nil) if call_count == 1
+        raise Bunny::NetworkFailure.new('Fail', nil) if call_count == 1
       end
 
       expect(described_class).to receive(:sleep).once
@@ -31,8 +33,8 @@ RSpec.describe RabbitmqConnection do
     end
 
     it 'desiste após 4 tentativas' do
-      allow(bunny_session).to receive(:start).and_raise(Bunny::NetworkFailure.new("Fail", nil))
-      
+      allow(bunny_session).to receive(:start).and_raise(Bunny::NetworkFailure.new('Fail', nil))
+
       expect { described_class.start }.to raise_error(Bunny::NetworkFailure)
       expect(described_class).to have_received(:sleep).exactly(4).times
     end
@@ -42,7 +44,7 @@ RSpec.describe RabbitmqConnection do
     it 'cria um canal usando a conexão' do
       # Reseta a variável de classe para garantir teste limpo
       described_class.instance_variable_set(:@channel, nil)
-      
+
       expect(described_class.channel).to eq(channel)
     end
   end

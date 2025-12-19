@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ActiveRecordProductRepository
   include ProductRepository
   def save(product)
@@ -15,7 +17,8 @@ class ActiveRecordProductRepository
 
   def find(id)
     ar_product = ProductModel.find(id)
-    Product.new(id: ar_product.id, name: ar_product.name, category: ar_product.category, description: ar_product.description, price: ar_product.price, quantity: ar_product.quantity)
+    Product.new(id: ar_product.id, name: ar_product.name, category: ar_product.category,
+                description: ar_product.description, price: ar_product.price, quantity: ar_product.quantity)
   rescue ActiveRecord::RecordNotFound
     nil
   end
@@ -37,7 +40,8 @@ class ActiveRecordProductRepository
 
   def find_all
     ProductModel.all.map do |ar_product|
-      Product.new(id: ar_product.id, name: ar_product.name, category: ar_product.category, description: ar_product.description, price: ar_product.price, quantity: ar_product.quantity)
+      Product.new(id: ar_product.id, name: ar_product.name, category: ar_product.category,
+                  description: ar_product.description, price: ar_product.price, quantity: ar_product.quantity)
     end
   end
 

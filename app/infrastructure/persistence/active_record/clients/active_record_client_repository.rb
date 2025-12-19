@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ActiveRecordClientRepository
   def save(client)
     ar_client = client.id ? ClientModel.find(client.id) : ClientModel.new
@@ -12,35 +14,29 @@ class ActiveRecordClientRepository
   end
 
   def find(id)
-    begin
-      ar_client = ClientModel.find(id)
-      ClientModel.new(id: ar_client.id, name: ar_client.name, email: ar_client.email, cpf: ar_client.cpf)
-    rescue ActiveRecord::RecordNotFound
-      nil
-    end
+    ar_client = ClientModel.find(id)
+    ClientModel.new(id: ar_client.id, name: ar_client.name, email: ar_client.email, cpf: ar_client.cpf)
+  rescue ActiveRecord::RecordNotFound
+    nil
   end
 
   def find_by_email(email)
     ar_client = ClientModel.find_by(email: email)
-    if ar_client
-      ClientModel.new(id: ar_client.id, name: ar_client.name, email: ar_client.email, cpf: ar_client.cpf)
-    else
-      nil
-    end
+    return unless ar_client
+
+    ClientModel.new(id: ar_client.id, name: ar_client.name, email: ar_client.email, cpf: ar_client.cpf)
   end
 
   def find_by_cpf(cpf)
     ar_client = ClientModel.find_by(cpf: cpf)
 
-    if ar_client
-      ClientModel.new(
-        id: ar_client.id,
-        name: ar_client.name,
-        email: ar_client.email,
-        cpf: ar_client.cpf
-      )
-    else
-      nil
-    end
+    return unless ar_client
+
+    ClientModel.new(
+      id: ar_client.id,
+      name: ar_client.name,
+      email: ar_client.email,
+      cpf: ar_client.cpf
+    )
   end
 end

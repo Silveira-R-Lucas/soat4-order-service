@@ -46,7 +46,7 @@ services:
   order-consumer:
     image: soat4/order-service
     container_name: order-consumer
-    command: bundle exec rails runner -e development app/workers/start_pagamento_consumer.rb
+    command: bundle exec rails runner "StartPagamentoConsumer.run"
     environment:
       DATABASE_URL: ${DATABASE_URL}
       RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672

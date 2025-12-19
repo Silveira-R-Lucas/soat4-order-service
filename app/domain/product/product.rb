@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Product
   attr_accessor :id, :name, :description, :category, :price, :quantity
 
@@ -11,6 +13,6 @@ class Product
   end
 
   def available?
-    quantity > 0
+    quantity.positive?
   end
 end

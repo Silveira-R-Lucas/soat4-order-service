@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe ActiveRecordCartRepository do
   subject { described_class.new }
   let!(:anonymous_client) do
-    ClientModel.find_by(id: 99999) || 
-    ClientModel.create!(id: 99999, name: 'Anônimo', email: 'anon@test.com', cpf: '00000000000')
+    ClientModel.find_by(id: 99_999) ||
+      ClientModel.create!(id: 99_999, name: 'Anônimo', email: 'anon@test.com', cpf: '00000000000')
   end
   let(:client) { ClientModel.create!(name: 'Lucas', email: 'lucas@test.com', cpf: '12345678900') }
 
@@ -12,7 +14,7 @@ RSpec.describe ActiveRecordCartRepository do
     it 'cria um carrinho sem cliente real associado' do
       cart = subject.create_anonymous_cart
       expect(cart).to be_a(Cart)
-      expect(cart.client_id).to eq(99999) # Conforme implementação
+      expect(cart.client_id).to eq(99_999) # Conforme implementação
       expect(CartModel.exists?(cart.id)).to be true
     end
   end
@@ -33,9 +35,10 @@ RSpec.describe ActiveRecordCartRepository do
   describe '#save' do
     it 'salva o carrinho e seus itens' do
       # Setup
-      product_model = ProductModel.create!(name: 'X-Bacon', category: 'Lanche', price: 20.0, quantity: 10, description: 'Bom')
+      product_model = ProductModel.create!(name: 'X-Bacon', category: 'Lanche', price: 20.0, quantity: 10,
+                                           description: 'Bom')
       cart = subject.create_anonymous_cart
-      
+
       # Adicionar item no domínio
       product = Product.new(id: product_model.id, name: 'X-Bacon', price: 20.0)
       cart.add_item(product: product, quantity: 2)

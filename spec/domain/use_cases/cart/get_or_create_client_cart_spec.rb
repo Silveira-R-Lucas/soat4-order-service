@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe GetOrCreateClientCart do
-  let(:cart_repository) { instance_double("CartRepository") }
+  let(:cart_repository) { instance_double('CartRepository') }
   subject { described_class.new(cart_repository: cart_repository) }
 
   describe '#call' do

@@ -1,15 +1,19 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe ActiveRecordProductRepository do
   subject { described_class.new }
 
   # FactoryBot deve estar configurado para criar ProductModel
-  let!(:product_model) { ProductModel.create!(name: 'Coca', category: 'Bebida', price: 5.0, quantity: 100, description: 'Gelada') }
+  let!(:product_model) do
+    ProductModel.create!(name: 'Coca', category: 'Bebida', price: 5.0, quantity: 100, description: 'Gelada')
+  end
 
   describe '#find' do
     it 'retorna uma entidade Product de domínio' do
       result = subject.find(product_model.id)
-      
+
       expect(result).to be_a(Product)
       expect(result.id).to eq(product_model.id)
       expect(result.name).to eq('Coca')
@@ -23,9 +27,9 @@ RSpec.describe ActiveRecordProductRepository do
   describe '#save' do
     it 'cria um novo registro se não tiver ID' do
       new_product = Product.new(name: 'Fanta', category: 'Bebida', price: 5.0, quantity: 50, description: 'Laranja')
-      
+
       saved_product = subject.save(new_product)
-      
+
       expect(saved_product.id).not_to be_nil
       expect(ProductModel.count).to eq(2)
     end
@@ -33,9 +37,9 @@ RSpec.describe ActiveRecordProductRepository do
     it 'atualiza registro existente se tiver ID' do
       domain_product = subject.find(product_model.id)
       domain_product.price = 6.0
-      
+
       subject.save(domain_product)
-      
+
       expect(ProductModel.find(product_model.id).price).to eq(6.0)
     end
   end

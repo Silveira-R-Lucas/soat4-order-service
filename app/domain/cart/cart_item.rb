@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CartItem
   attr_accessor :id, :cart_id, :product_id, :product_name, :product_price, :quantity
 
