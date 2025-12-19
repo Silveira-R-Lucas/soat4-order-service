@@ -1,17 +1,20 @@
-class Cart
-  attr_accessor :id, :client_id, :items, :payment_status, :status, :total_price, :created_at, :updated_at, :payment_details
+# frozen_string_literal: true
 
-  VALID_STATUS = %w[ novo recebido em_preparação pronto finalizado].freeze
-  PAYMENT_STATUS = %w[ pendente aprovado autorizado aguardando_pagamento rejeitado cancelado].freeze
-  IN_PROGRESS_STATUS = %w[ pronto em_preparação recebido].freeze
+class Cart
+  attr_accessor :id, :client_id, :items, :payment_status, :status, :total_price, :created_at, :updated_at,
+                :payment_details
+
+  VALID_STATUS = %w[novo recebido em_preparação pronto finalizado].freeze
+  PAYMENT_STATUS = %w[pendente aprovado autorizado aguardando_pagamento rejeitado cancelado].freeze
+  IN_PROGRESS_STATUS = %w[pronto em_preparação recebido].freeze
 
   def initialize(attributes = {})
     @id = attributes[:id]
     @client_id = attributes[:client_id]
-    @payment_status = attributes[:payment_status] || "pendente"
-    @status = attributes[:status] || "novo"
+    @payment_status = attributes[:payment_status] || 'pendente'
+    @status = attributes[:status] || 'novo'
     @items = attributes[:items] || []
-    @total_price = self.total_amount
+    @total_price = total_amount
     @created_at = attributes[:created_at]
     @updated_at = attributes[:updated_at]
   end
@@ -21,19 +24,24 @@ class Cart
       raise ArgumentError, "Status inválido: #{new_status}. Statuses válidos são: #{VALID_STATUS.join(', ')}."
     end
 
-    raise ArgumentError, "Não é possível mudar pedido 'finalizado'." if status == "finalizado"
+    raise ArgumentError, "Não é possível mudar pedido 'finalizado'." if status == 'finalizado'
+
     self.status = new_status
   end
 
   def payment_approved_or_authorized?
-    payment_status == "aprovado" || payment_status == "autorizado" || payment_status == "pago"
+    %w[aprovado autorizado pago].include?(payment_status)
   end
 
   def mark_as_received!
     raise ArgumentError, "Carrinho vazio, não é possível atualizar status para 'recebido'." if empty?
-    raise ArgumentError, "Pagamento pendente ou não autorizado, não é possível atualizar status para 'recebido'" unless payment_approved_or_authorized?
 
-    self.status = "recebido"
+    unless payment_approved_or_authorized?
+      raise ArgumentError,
+            "Pagamento pendente ou não autorizado, não é possível atualizar status para 'recebido'"
+    end
+
+    self.status = 'recebido'
   end
 
   def update_status_based_on_payment_notification(status)
@@ -41,7 +49,7 @@ class Cart
   end
 
   def mark_as_paid
-    self.payment_status = "aprovado"
+    self.payment_status = 'aprovado'
   end
 
   def empty?
@@ -97,7 +105,6 @@ class Cart
     true
   end
 
-
   def total_amount
     @items.sum { |item| item.product_price * item.quantity }.to_f
   end
@@ -144,7 +151,7 @@ class Cart
     }
   end
 
-  def to_h_payment_display 
+  def to_h_payment_display
     {
       pedido_id: id,
       total_amount: total_amount,
@@ -152,7 +159,7 @@ class Cart
         {
           title: item.product_name,
           quantity: item.quantity,
-          unit_measure: "unit",
+          unit_measure: 'unit',
           currency_id: 'BRL',
           unit_price: item.product_price.to_f,
           total_amount: item.product_price.to_f * item.quantity

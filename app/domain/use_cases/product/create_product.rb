@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateProduct
   def initialize(product_repository:)
     @product_repository = product_repository

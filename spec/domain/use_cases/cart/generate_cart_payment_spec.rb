@@ -1,23 +1,24 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe GenerateCartPayment do
-  let(:cart_repository) { instance_double("CartRepository") }
-  let(:gateway) { instance_double("PaymentGatewayAdapter") }
+  let(:cart_repository) { instance_double('CartRepository') }
+  let(:gateway) { instance_double('PaymentGatewayAdapter') }
   subject { described_class.new(cart_repository: cart_repository, payment_gateway_adapter: gateway) }
 
   describe '#call' do
-    let(:product) { build(:product) } 
-    let(:cart_item) do 
-        build(:cart_item, 
-        product_id: product.id, 
-        product_name: product.name, 
-        product_price: product.price,
-        quantity: 2
-        ) 
+    let(:product) { build(:product) }
+    let(:cart_item) do
+      build(:cart_item,
+            product_id: product.id,
+            product_name: product.name,
+            product_price: product.price,
+            quantity: 2)
     end
     let(:cart) { Cart.new(id: 1, items: [cart_item], payment_status: 'pendente') }
     let(:success_response) do
-      { successful: true, response: { "in_store_order_id" => "123", "qr_data" => "qr123" } }
+      { successful: true, response: { 'in_store_order_id' => '123', 'qr_data' => 'qr123' } }
     end
 
     it 'gera pagamento e atualiza status para aguardando_pagamento' do

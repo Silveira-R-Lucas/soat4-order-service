@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module CartRepository
   def find_by_client_id(client_id)
     raise NotImplementedError

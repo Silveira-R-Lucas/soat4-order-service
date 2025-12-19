@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe ActiveRecordClientRepository do
   subject { described_class.new }
-  
+
   # Limpa o banco para garantir testes isolados
   before { ClientModel.delete_all }
 
@@ -10,7 +12,7 @@ RSpec.describe ActiveRecordClientRepository do
     it 'cria um novo cliente no banco' do
       client = ClientModel.new(name: 'Teste', email: 'teste@email.com', cpf: '11111111111')
       saved_client = subject.save(client)
-      
+
       expect(saved_client.id).not_to be_nil
       expect(ClientModel.count).to eq(1)
     end
@@ -18,9 +20,9 @@ RSpec.describe ActiveRecordClientRepository do
     it 'atualiza um cliente existente' do
       existing = ClientModel.create!(name: 'Antigo', email: 'antigo@email.com', cpf: '22222222222')
       client = ClientModel.new(id: existing.id, name: 'Novo Nome', email: 'novo@email.com', cpf: '22222222222')
-      
+
       subject.save(client)
-      
+
       updated = ClientModel.find(existing.id)
       expect(updated.name).to eq('Novo Nome')
     end
@@ -30,14 +32,14 @@ RSpec.describe ActiveRecordClientRepository do
     it 'retorna a entidade Client quando encontra' do
       model = ClientModel.create!(name: 'Busca', email: 'busca@email.com', cpf: '33333333333')
       result = subject.find(model.id)
-      
+
       expect(result).to be_a(ClientModel)
       expect(result.id).to eq(model.id)
       expect(result.name).to eq('Busca')
     end
 
     it 'retorna nil se não encontrar' do
-      expect(subject.find(999999)).to be_nil
+      expect(subject.find(999_999)).to be_nil
     end
   end
 

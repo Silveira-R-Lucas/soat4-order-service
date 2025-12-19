@@ -1,14 +1,14 @@
+# frozen_string_literal: true
+
 class ActiveRecordCartRepository
   include CartRepository
 
   def find_or_create_by_client_id(client_id, cart_id)
+    ar_cart = CartModel.includes(:cart_item_models).find_by(id: cart_id)
     if client_id.present? && cart_id.present?
-      ar_cart = CartModel.includes(:cart_item_models).find_by(id: cart_id)
       ar_client = ClientModel.find_by(id: client_id)
       ar_cart.client_model_id = ar_client.id if ar_client
       ar_cart.save!
-    else
-      ar_cart = CartModel.includes(:cart_item_models).find_by(id: cart_id)
     end
 
     unless ar_cart
@@ -23,7 +23,7 @@ class ActiveRecordCartRepository
 
   def create_anonymous_cart
     ar_cart = CartModel.create!
-    ar_cart.client_model_id = 99999
+    ar_cart.client_model_id = 99_999
     ar_cart.save!
     map_ar_cart_to_domain(ar_cart)
   end
@@ -81,6 +81,7 @@ class ActiveRecordCartRepository
 
   def map_ar_cart_to_domain(ar_cart)
     return nil unless ar_cart
+
     items = ar_cart.cart_item_models.map do |ar_item|
       CartItem.new(
         id: ar_item.id,
@@ -92,13 +93,14 @@ class ActiveRecordCartRepository
       )
     end
     Cart.new(
-    id: ar_cart.id,
-    client_id: ar_cart.client_model_id,
-    items: items,
-    total_price: ar_cart.total_price,
-    payment_status: ar_cart.payment_status,
-    status: ar_cart.status,
-    created_at: ar_cart.created_at,
-    updated_at: ar_cart.updated_at)
+      id: ar_cart.id,
+      client_id: ar_cart.client_model_id,
+      items: items,
+      total_price: ar_cart.total_price,
+      payment_status: ar_cart.payment_status,
+      status: ar_cart.status,
+      created_at: ar_cart.created_at,
+      updated_at: ar_cart.updated_at
+    )
   end
 end

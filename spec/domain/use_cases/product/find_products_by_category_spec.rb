@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe FindProductsByCategory do
-  let(:product_repository) { instance_double("ProductRepository") }
+  let(:product_repository) { instance_double('ProductRepository') }
   subject { described_class.new(product_repository: product_repository) }
 
   describe '#call' do

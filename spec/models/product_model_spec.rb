@@ -1,15 +1,17 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe ProductModel, type: :model do
-  subject { 
+  subject do
     described_class.new(
-      name: 'Test Product', 
-      category: 'Lanche', 
-      price: 10.0, 
-      quantity: 10, 
+      name: 'Test Product',
+      category: 'Lanche',
+      price: 10.0,
+      quantity: 10,
       description: 'Desc'
-    ) 
-  }
+    )
+  end
 
   context 'validations' do
     it 'é válido com atributos válidos' do
