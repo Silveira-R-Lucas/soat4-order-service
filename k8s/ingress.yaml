@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: order-ingress
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /api/v1/cart
+        pathType: Prefix
+        backend:
+          service:
+            name: order-api-service
+            port:
+              number: 80
+      - path: /api/v1/create_product
+        pathType: Prefix
+        backend:
+          service:
+            name: order-api-service
+            port:
+              number: 80

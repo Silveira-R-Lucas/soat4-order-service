@@ -86,8 +86,8 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-  build-and-deploy-to-ecr:
-    name: Build and Deploy to ECR
+  build-and-deploy-to-k8s:
+    name: Build, Push and Deploy to K8s
     runs-on: ubuntu-latest
     needs: test-and-analyze
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
@@ -95,16 +95,11 @@ jobs:
     env:
       ECR_REPOSITORY: soat-challenge/order-service
       AWS_REGION: sa-east-1
-
-    permissions:
-      contents: read
-      id-token: write
+      CLUSTER_NAME: soat-cluster-eks
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -117,14 +112,51 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build, tag, and push image to Amazon ECR
+      - name: Build, tag, and push image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
         run: |
-          IMAGE_TAG=${{ github.sha }}
-          
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           
           docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+
+      - name: Update Kubeconfig
+        run: |
+          aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ env.CLUSTER_NAME }}
+
+      - name: Deploy to Kubernetes
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          # Substitui a imagem nos arquivos yaml pela imagem recém buildada
+          sed -i "s|image: .*|image: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG|g" k8s/*.yaml
+          
+          # Aplica todas as configurações e deployments
+          kubectl apply -f k8s/configs.yaml
+          kubectl apply -f k8s/api-deployment.yaml
+          kubectl apply -f k8s/consumer-deployment.yaml
+          kubectl apply -f k8s/ingress.yaml
+
+      - name: Verify Rollout
+        run: |
+          kubectl rollout status deployment/order-api
+          kubectl rollout status deployment/order-worker
+          kubectl rollout status deployment/order-consumer
+
+      - name: Sync Master Key to AWS Secrets Manager
+        run: |
+          SECRET_NAME="soat/order-service/master_key"
+          MASTER_KEY=$(cat config/master.key)
+
+          if aws secretsmanager describe-secret --secret-id "$SECRET_NAME" > /dev/null 2>&1; then
+            echo "Atualizando chave existente..."
+            aws secretsmanager put-secret-value --secret-id "$SECRET_NAME" --secret-string "$MASTER_KEY"
+          else
+            echo "Criando novo segredo para a Master Key..."
+            aws secretsmanager create-secret --name "$SECRET_NAME" --secret-string "$MASTER_KEY" --description "Master Key do Order Service"
+          fi

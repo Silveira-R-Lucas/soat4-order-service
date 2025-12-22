@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: order-api
+  template:
+    metadata:
+      labels:
+        app: order-api
+    spec:
+      containers:
+      - name: order-service
+        image: soat4/order-service:latest
+        command: ["bundle", "exec", "rails", "s", "-b", "0.0.0.0", "-p", "3000"]
+        ports:
+        - containerPort: 3000
+        envFrom:
+        - configMapRef:
+            name: order-service-config
+        - secretRef:
+            name: order-service-secrets
+        readinessProbe:
+          httpGet:
+            path: /up
+            port: 3000
+          initialDelaySeconds: 15
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-api-service
+spec:
+  selector:
+    app: order-api
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 3000
